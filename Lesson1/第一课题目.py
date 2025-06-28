@@ -12,3 +12,4 @@
 # POST /favorites - 添加新收藏
 # DELETE /favorites/<int:fav_id> - 删除收藏
 # PUT /favorites/<int:fav_id> - 更新收藏信息
+# 备注：收藏数据的字段如下: {"id": 唯一 ID 号, "user_id": 用户 ID 号, "article_id": 作者 ID 号, "note": "收藏内容"}
