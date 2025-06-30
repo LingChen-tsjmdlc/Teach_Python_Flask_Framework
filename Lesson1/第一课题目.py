@@ -14,100 +14,114 @@
 # PUT /favorites/<int:fav_id> - 更新收藏信息
 # 备注：收藏数据的字段如下: {"id": 唯一 ID 号, "user_id": 用户 ID 号, "article_id": 作者 ID 号, "note": "收藏内容"}
 
-#导入Flask的包
+# 导入Flask的包
 from flask import Flask, jsonify, request
 
-#创建Flask的程序
+# 创建Flask的程序
 app = Flask(__name__)
 
-#创建列表字典
+# 创建列表字典
 favorites = [
-    {'id':1,'user_id':11,'article_id':111,'note':'test1'},
-    {'id':2,'user_id':22,'article_id':222,'note':'test2'},
+    {"id": 1, "user_id": 11, "article_id": 111, "note": "test1"},
+    {"id": 2, "user_id": 22, "article_id": 222, "note": "test2"},
 ]
 
 
-#创建路由
-@app.route('/')
+# 创建路由
+@app.route("/")
 def home():
     return "<h1>Hello,Word!!!<h1>"
 
 
-#使用GET获取所有收藏
-@app.route('/favorite',methods=['GET'])
+# 使用GET获取所有收藏
+@app.route("/favorite", methods=["GET"])
 def get_favorites():
-    return jsonify(favorites)
+    global favorites
+    try:
+        return jsonify({"code": 200, "msg": "成功", "data": favorites})
+    except:
+        return jsonify({"code": 500, "msg": "后端错误", "data": {}})
 
 
-#通过动态路由使用GET查找特定的收藏
-@app.route('/favorite/<int:favorite_id>',methods=['GET'])
+# 通过动态路由使用GET查找特定的收藏
+@app.route("/favorite/<int:favorite_id>", methods=["GET"])
 def get_favorite(favorite_id):
-    global favorites
-    for f in favorites:
-        if f['id'] == favorite_id:
-            favorite_find = f
-            break
-        else:
-            favorite_find = None
-    return jsonify(favorite_find)
-
-
-#使用POST添加新的收藏
-@app.route('/favorite',methods=['POST'])
-def add_favorite():
-    data = request.get_json()
-    new_favorite = {
-        "id":len(favorites) + 1,
-        "user_id":data['user_id'],
-        "article_id":data['article_id'],
-        "note":data['note'],
-    }
-    favorites.append(new_favorite)
-    return jsonify(new_favorite),200
-
-#使用DELETE删除收藏
-@app.route('/favorite/<int:favorite_id>',methods=['DELETE'])
-def delete_favorite(favorite_id):
-    global favorites
-    found = False
-    for f in favorites:
-        if f['id'] == favorite_id:
-            found = True
-            break
-    if found:
-        new_favorites = []
+    try:
+        global favorites
         for f in favorites:
-            if f['id'] != favorite_id:
-                new_favorites.append(f)
-        favorites = new_favorites
-        return "删除成功",200
-    else:
-        return "Not Found",404
+            if f["id"] == favorite_id:
+                favorite_find = f
+                break
+            else:
+                favorite_find = None
+        return jsonify({"code": 200, "msg": "成功", "data": favorite_id})
+    except:
+        return jsonify({"code": 500, "msg": "后端错误", "data": {}})
 
 
-#使用PUT修改收藏信息
-@app.route('/favorite/<int:favorite_id>',methods=['PUT'])
+# 使用POST添加新的收藏
+@app.route("/favorite", methods=["POST"])
+def add_favorite():
+    try:
+        data = request.get_json()
+        new_favorite = {
+            "id": len(favorites) + 1,
+            "user_id": data["user_id"],
+            "article_id": data["article_id"],
+            "note": data["note"],
+        }
+        favorites.append(new_favorite)
+        return jsonify({"code": 200, "msg": "成功", "data": new_favorite})
+    except:
+
+        return jsonify({"code": 500, "msg": "后端错误", "data": {}})
+
+
+# 使用DELETE删除收藏
+@app.route("/favorite/<int:favorite_id>", methods=["DELETE"])
+def delete_favorite(favorite_id):
+    try:
+        global favorites
+        found = False
+        for f in favorites:
+            if f["id"] == favorite_id:
+                found = True
+                break
+        if found:
+            new_favorites = []
+            for f in favorites:
+                if f["id"] != favorite_id:
+                    new_favorites.append(f)
+            favorites = new_favorites
+            return jsonify({"code": 200, "msg": "删除成功", "data": {}})
+        else:
+           return jsonify({"code": 404, "msg": "Not,Fund", "data": {}})
+    except:
+        return jsonify({"code": 500, "msg": "后端错误", "data": {}})
+
+
+# 使用PUT修改收藏信息
+@app.route("/favorite/<int:favorite_id>", methods=["PUT"])
+
 def update_favorite(favorite_id):
-    data = request.get_json()
-    found_favorite = None
-    for f in favorites:
-        if f['id'] == favorite_id:
-            found_favorite = f
-            break
-    if not found_favorite:
-        return "Not Found",404
+    try:
+            data = request.get_json()
+            found_favorite = None
+            for f in favorites:
+                if f["id"] == favorite_id:
+                    found_favorite = f
+                    break
+            if not found_favorite:
+               return jsonify({"code": 404, "msg": "Not,Fund", "data": {}})
 
-    found_favorite['user_id'] = data['user_id']
-    found_favorite['article_id'] = data['article_id']
-    found_favorite['note'] = data['note']
+            found_favorite["user_id"] = data["user_id"]
+            found_favorite["article_id"] = data["article_id"]
+            found_favorite["note"] = data["note"]
 
-    return jsonify(found_favorite)
+            return jsonify({"code": 200, "msg": "修改成功", "data": found_favorite})
+    except:
+        return jsonify({"code": 500, "msg": "后端错误", "data": {}})
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
